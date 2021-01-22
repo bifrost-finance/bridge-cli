@@ -64,19 +64,16 @@ pub mod bridge_eos {
             amount,
             memo,
         };
-        // let extrinsic = client.create_signed(call, from).await?;
-
-        let block_hash = client.submit(call, from).await?;
+        let extrinsic = client.create_signed(call, from).await?;
         
-        // let mut decoder = client.events_decoder::<CrossToEosCall<BifrostRuntime>>();
-        // decoder.with_bridge_eos();
+        let mut decoder = client.events_decoder::<CrossToEosCall<BifrostRuntime>>();
+        decoder.with_bridge_eos();
         
-        // let bridge_eos_events = client.submit_and_watch_extrinsic(extrinsic, decoder).await?;
-        // println!("11111");
-        // let event = bridge_eos_events
-        //     .find_event::<SentCrossChainTransactionEvent::<BifrostRuntime>>()?
-        //     .ok_or("No Event found or decoded.")?;
-        // let block_hash = bridge_eos_events.block;
+        let bridge_eos_events = client.submit_and_watch_extrinsic(extrinsic, decoder).await?;
+        let event = bridge_eos_events
+            .find_event::<SentCrossChainTransactionEvent::<BifrostRuntime>>()?
+            .ok_or("No Event found or decoded.")?;
+        let block_hash = bridge_eos_events.block;
 
         Ok(block_hash.to_string())
     }
@@ -134,14 +131,14 @@ pub mod assets {
 
         let asset = client.account_assets((asset_id, &who.clone().into()), None).await?;
 
-        let mut iter = client.account_assets_iter(None).await?;
-        let mut index = 0u32;
-        while let Some((key, val)) = iter.next().await? {
-            let k: Result<(u32, AccountId32), _> = serde_json::from_slice(&key.0);
-            println!("key: {:?}, value: {:?}", key, val);
-            index += 1;
-        }
-        println!("length: {:?}", index);
+        // let mut iter = client.account_assets_iter(None).await?;
+        // let mut index = 0u32;
+        // while let Some((key, val)) = iter.next().await? {
+        //     let k: Result<(u32, AccountId32), _> = serde_json::from_slice(&key.0);
+        //     println!("key: {:?}, value: {:?}", key, val);
+        //     index += 1;
+        // }
+        // println!("length: {:?}", index);
 
         Ok(asset)
     }

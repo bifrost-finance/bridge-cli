@@ -1,2 +1,2 @@
 # bridge-cli
-A Cli tool for bridge interoperability
+A cli tool for bridge interoperability.
