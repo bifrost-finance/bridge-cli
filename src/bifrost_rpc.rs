@@ -131,14 +131,14 @@ pub mod assets {
 
         let asset = client.account_assets((asset_id, &who.clone().into()), None).await?;
 
-        // let mut iter = client.account_assets_iter(None).await?;
-        // let mut index = 0u32;
-        // while let Some((key, val)) = iter.next().await? {
-        //     let k: Result<(u32, AccountId32), _> = serde_json::from_slice(&key.0);
-        //     println!("key: {:?}, value: {:?}", key, val);
-        //     index += 1;
-        // }
-        // println!("length: {:?}", index);
+        let mut iter = client.account_assets_iter(None).await?;
+        let mut index = 0u32;
+        while let Some((key, val)) = iter.next().await? {
+            let k: Result<(u32, AccountId32), _> = serde_json::from_slice(&key.0);
+            println!("key: {:?}, value: {:?}", key, val);
+            index += 1;
+        }
+        println!("length: {:?}", index);
 
         Ok(asset)
     }
