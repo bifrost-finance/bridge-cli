@@ -18,9 +18,9 @@ pub(crate) struct GetAccount {
     pub head_block_time: String,
     pub last_code_update: String,
     pub created: String,
-    pub net_weight: String,
-    pub cpu_weight: String,
-    pub ram_usage: String,
+    pub net_weight: u32,
+    pub cpu_weight: u32,
+    pub ram_usage: u32,
     pub privileged: bool,
 }
 

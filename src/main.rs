@@ -11,10 +11,43 @@ mod bifrost_rpc;
 mod command;
 mod eos_rpc;
 
+use crate::command::{BridgeCmd, EOSCmd, BifrostCmd};
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let cmd = command::BridgeCmd::from_args();
-    println!("{:?}", cmd);
+    let args = command::BridgeCmd::from_args();
+    println!("{:?}", args);
+
+    match args {
+        BridgeCmd::EOS(eos_args) => {
+            println!("{:?}", eos_args);
+            match eos_args {
+                EOSCmd::Get { ref url, ref account } => {
+                    let block = eos_rpc::get_account(url, account).await;
+                    println!("block num: {:?}", block);
+                }
+                EOSCmd::PushTransaction { ref url, private_key, amount } => {
+                    let block = eos_rpc::get_block(url, &amount.to_string()).await;
+                }
+            }
+        }
+        BridgeCmd::Bifrost(bifrost_args) => {
+            println!("{:?}", bifrost_args);
+            match bifrost_args {
+                BifrostCmd::Get { ref url, account , asset_id } => {
+                    let who = AccountId32::from_ss58check(&account).map_err(|_| "Invalid Address".to_owned())?;
+                    let user_asset = bifrost_rpc::assets::get_asset_by_account(url, &who, asset_id).await?;
+                    println!("user asset: {:?}", user_asset);
+                }
+                BifrostCmd::PushTransaction { ref url, ref from, to, amount, memo } => {
+                    let from = Pair::from_string(from, None).map_err(|_| "Invalid seed!".to_owned())?;
+                    let from = PairSigner::<BifrostRuntime, Pair>::new(from);
+                    let block = bifrost_rpc::bridge_eos::cross_to_eos(url, &from, to.as_bytes().to_vec(), amount, memo.as_bytes().to_vec()).await?;
+                    println!("This transaction happened on block: {:?}", block);
+                }
+            }
+        }
+    }
 
     // let url = "https://jungle3.cryptolions.io:443";
     // let info = eos_rpc::get_info(url).await;

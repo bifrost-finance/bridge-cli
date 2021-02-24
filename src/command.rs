@@ -7,11 +7,16 @@ pub enum BifrostCmd {
     Get {
         url: String,
         account: String,
+        #[structopt(default_value = "6")]
+        asset_id: u32,
     },
     PushTransaction {
         url: String,
-        private_key: String,
-        amount: u32,
+        from: String,
+        to: String,
+        amount: u128,
+        #[structopt(default_value = "Bifrost")]
+        memo: String,
     }
 }
 
